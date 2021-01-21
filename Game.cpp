@@ -1,7 +1,7 @@
 #include "framework.h"
 
 // window
-const LPCSTR	Game::winName = "Grand Theft Auto V";
+const LPCSTR	Game::winName = "DOOMEternal";
 HWND			Game::winHWND;
 
 int				Game::left;
@@ -13,10 +13,10 @@ int				Game::width;
 int				Game::height;
 
 // process
-const wchar_t*	Game::procName = L"GTA5.exe";
+const wchar_t* Game::procName = L"DOOMEternalx64vk.exe";
 HANDLE			Game::procHandle;
 DWORD			Game::procId;
-uintptr_t		Game::moduleBase;	// "GTA5.exe"
+uintptr_t		Game::moduleBase;	
 uintptr_t		Game::moduleSize;
 
 

@@ -56,12 +56,14 @@ void Draw::Render()
 	if (Game::winHWND == GetForegroundWindow())
 	{
 		// Gets self info
+		/*
 		Self::GetBasicInfo();
 		Self::GetViewMatrix();
 		Self::GetHealth();
 		Self::GetWorldCoords();
 		// Draws self info
-		
+		*/
+		Draw::String(Game::width / 2, Game::height / 2, "W2SHelper", Yellow);
 	}
 	d3dDevice->EndScene();
 	d3dDevice->PresentEx(0, 0, 0, 0, 0);
