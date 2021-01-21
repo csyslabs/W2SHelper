@@ -19,9 +19,13 @@ void Self::GetWorldCoords()
 	worldCoords.z = Memory::Read<float>(address + Offset::coordZ_offEntity);
 }
 
-void Self::GetBasicInfo()
+void Self::GetLocalPlayer()
 {
-	address = Memory::Read<uintptr_t>(Game::moduleBase + Offset::localPlayer_offModule);
+	uintptr_t temp = Game::moduleBase;
+	for (int i = 0; i < 3; i++) {
+		temp = Memory::Read<uintptr_t>(temp + Offset::localPlayer_offModule[i]);
+	}
+	address = temp;
 }
 
 void Self::GetViewMatrix()

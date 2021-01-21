@@ -28,8 +28,8 @@ public:
 	static int Green;
 
 	static void Render();
-	static void Text(char* String, int x, int y, int a, int r, int g, int b);
 	static void String(int x, int y, const char* string, D3DCOLOR color);
+	static std::string ToHexString(uintptr_t n);
 	static void Rect(int x, int y, int width, int height, D3DCOLOR color);
 	static void BorderedRect(int x, int y, int width, int height, int fa, int fr, int fg, int fb, D3DCOLOR color);
 	static void Line(int x, int y, int x1, int y2, D3DCOLOR color);

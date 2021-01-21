@@ -31,15 +31,15 @@ public:
 namespace Offset
 {
 	// off module
-	static uintptr_t localPlayer_offModule = 0x1C923C8;
-	static uintptr_t viewmatrix_offModule = 0x1F8B140;
+	static uintptr_t localPlayer_offModule[3] = {0x616F300, 0x0, 0x18};
+	static uintptr_t viewmatrix_offModule = 0x5BBD810;
 
 	// off entity
 	static uintptr_t health_offEntity = 0x280;
 	static uintptr_t maxHealth_offEntity = 0x2A0;
-	static uintptr_t coordX_offEntity = 0x90;
-	static uintptr_t coordY_offEntity = 0x94;
-	static uintptr_t coordZ_offEntity = 0x98;
+	static uintptr_t coordX_offEntity = 0x94C;
+	static uintptr_t coordY_offEntity = 0x950;
+	static uintptr_t coordZ_offEntity = 0x954;
 };
 
 namespace Memory

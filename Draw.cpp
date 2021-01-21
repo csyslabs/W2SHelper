@@ -56,14 +56,21 @@ void Draw::Render()
 	if (Game::winHWND == GetForegroundWindow())
 	{
 		// Gets self info
+		Self::GetWorldCoords();
+		Self::GetViewMatrix();
+		vec3d_f rLocation = { Self::worldCoords.x + 3.f, Self::worldCoords.y, Self::worldCoords.z };
+		//Draw::String(Game::width / 2, Game::height / 2, ToHexString(Self::address).c_str(), Yellow);
+		if (Math::WorldToScreenC(rLocation, Math::screen, Self::viewMatrix, Game::width, Game::height)) {
+			//Draw::Rect(Math::screen.x, Math::screen.y, 50, 70, Red);
+			Draw::Line(Game::width / 2, Game::height / 2, Math::screen.x, Math::screen.y, Red);
+		}
 		/*
-		Self::GetBasicInfo();
 		Self::GetViewMatrix();
 		Self::GetHealth();
 		Self::GetWorldCoords();
 		// Draws self info
 		*/
-		Draw::String(Game::width / 2, Game::height / 2, "W2SHelper", Yellow);
+		//Draw::String(Game::width / 2, Game::height / 2, "W2SHelper", Yellow);
 	}
 	d3dDevice->EndScene();
 	d3dDevice->PresentEx(0, 0, 0, 0, 0);
@@ -83,6 +90,29 @@ void Draw::String(int x, int y, const char* string, D3DCOLOR color)
 	//Position.top = y;
 	//d3dFont->DrawTextA(0, string, strlen(string), &Position, DT_NOCLIP, color);
 
+}
+
+// const char* cc = string_value.c_str();
+std::string Draw::ToHexString(uintptr_t n)
+{
+	std::string res = "";
+	uintptr_t stk[100] = {};
+	int tt = 0;
+	for (; n; n /= 16) {
+		stk[++tt] = n % 16;				// push
+	}
+	for (; tt; tt--) {
+		switch (stk[tt]) {				// pop
+		case 10:res += "A"; break;
+		case 11:res += "B"; break;
+		case 12:res += "C"; break;
+		case 13:res += "D"; break;
+		case 14:res += "E"; break;
+		case 15:res += "F"; break;
+		default:res += std::to_string(stk[tt]); break;
+		}
+	}
+	return res;
 }
 
 // [x, y} is the middle point if each entity

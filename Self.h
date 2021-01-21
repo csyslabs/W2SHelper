@@ -13,7 +13,7 @@ public:
 
 	// self specific info
 	static float viewMatrix[16];
-	static void GetBasicInfo();
+	static void GetLocalPlayer();
 	static void GetViewMatrix();
 };
 

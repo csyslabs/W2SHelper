@@ -34,6 +34,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Saves instance handle and creates main window
     if (!InitInstance(hInstance, SW_SHOW)) return FALSE;
 
+    Self::GetLocalPlayer();
+
+
     // Inits drawing
     Draw::Initial(overlayHWND);
 
