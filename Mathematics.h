@@ -11,7 +11,7 @@ public:
 	static vec4d_f clipCoords;
 	static vec4d_f NDC;
 
-	static bool WorldToScreen(vec3d_f pos, vec2d_f& screen, float matrix[16], int windowWidth, int windowHeight);
+	static bool WorldToScreenR(vec3d_f pos, vec2d_f& screen, float matrix[16], int windowWidth, int windowHeight);
 	static bool WorldToScreenC(vec3d_f pos, vec2d_f& screen, float matrix[16], int windowWidth, int windowHeight);
 
 	static float GetDistance3D(vec3d_f m_pos, vec3d_f en_pos);

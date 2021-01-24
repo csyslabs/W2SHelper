@@ -7,13 +7,12 @@ public:
 	static const LPCSTR			winName;
 	static HWND					winHWND;
 
-	static int					left;
-	static int					right;
-	static int					top;
-	static int					bottom;
-
-	static int					width;
-	static int					height;
+	static float				left;
+	static float				right;
+	static float				top;
+	static float				bottom;
+	static float				width;
+	static float				height;
 
 	// process
 	static const wchar_t*		procName;
@@ -31,11 +30,13 @@ public:
 namespace Offset
 {
 	// off module
-	static uintptr_t localPlayer_offModule[3] = {0x616F300, 0x0, 0x18};
-	static uintptr_t viewmatrix_offModule = 0x5BBD810;
+	static uintptr_t localPlayer_offModule[3] = {0x616F300, 0x0, 0x18};	// doom eternal
+	static uintptr_t viewmatrix_offModule = 0x5BBD810;	// doom eternal
+	//static uintptr_t viewmatrix_offModule = 0x3FE76F0;
 
+	static uintptr_t opCoordX_offModule[3] = { 0x3E43E28, 0x38, 0x70 };
 	// off entity
-	static uintptr_t health_offEntity = 0x280;
+	static uintptr_t health_offEntity = 0x3513C;
 	static uintptr_t maxHealth_offEntity = 0x2A0;
 	static uintptr_t coordX_offEntity = 0x94C;
 	static uintptr_t coordY_offEntity = 0x950;

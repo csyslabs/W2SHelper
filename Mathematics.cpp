@@ -4,8 +4,8 @@ vec2d_f Math::screen;
 vec4d_f Math::clipCoords;
 vec4d_f Math::NDC;
 
-// raw major - gta5(raw major), assault cube(raw major) - verified
-bool Math::WorldToScreen(vec3d_f pos, vec2d_f& screen, float matrix[16], int windowWidth, int windowHeight)
+// row major - gta5(row major), assault cube(row major) - verified
+bool Math::WorldToScreenR(vec3d_f pos, vec2d_f& screen, float matrix[16], int windowWidth, int windowHeight)
 {
 
 	Math::clipCoords.x = pos.x * matrix[0] + pos.y * matrix[4] + pos.z * matrix[8] + matrix[12];

@@ -4,16 +4,15 @@
 const LPCSTR	Game::winName = "DOOMEternal";
 HWND			Game::winHWND;
 
-int				Game::left;
-int				Game::right;
-int				Game::top;
-int				Game::bottom;
-
-int				Game::width;
-int				Game::height;
+float				Game::left;
+float				Game::right;
+float				Game::top;
+float				Game::bottom;
+float				Game::width;
+float				Game::height;
 
 // process
-const wchar_t* Game::procName = L"DOOMEternalx64vk.exe";
+const wchar_t*	Game::procName = L"DOOMEternalx64vk.exe";
 HANDLE			Game::procHandle;
 DWORD			Game::procId;
 uintptr_t		Game::moduleBase;	
@@ -42,7 +41,6 @@ void Game::GetWindowInfo() {
 void Game::GetModuleBase()
 {
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
-	//QWORD dwModuleBaseAddress = 0;
 	uintptr_t modBaseAddr = 0;
 	if (hSnapshot != INVALID_HANDLE_VALUE)
 	{

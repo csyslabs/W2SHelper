@@ -12,12 +12,6 @@
 class Draw
 {
 public:
-	/*
-	IDirect3D9Ex* d3dObject = NULL;  //used to create device
-	IDirect3DDevice9Ex* d3dDevice = NULL;  //contains functions like begin and end scene
-	D3DPRESENT_PARAMETERS d3dparams;  //parameters for creating device
-	ID3DXFont* d3dFont = 0;   // font used when displaying text
-	*/
 	static void Initial(HWND overlayHWND);
 
 	static int Red;
@@ -27,14 +21,17 @@ public:
 	static int Miku;
 	static int Green;
 
+	static const char* bot[6];
+	
 	static void Render();
-	static void String(int x, int y, const char* string, D3DCOLOR color);
+	static void TraceLine(vec3d_f center, int index);
+
+	static bool isInScreen(vec2d_f vertex_2d[8]);
+	static void Cube(vec3d_f center, float r, int index);
+	static void RelativeCube(vec3d_f worldCoords);
+	static void String(vec2d_f pos, const char* string, D3DCOLOR color);
 	static std::string ToHexString(uintptr_t n);
-	static void Rect(int x, int y, int width, int height, D3DCOLOR color);
-	static void BorderedRect(int x, int y, int width, int height, int fa, int fr, int fg, int fb, D3DCOLOR color);
-	static void Line(int x, int y, int x1, int y2, D3DCOLOR color);
-	static void HealthBar(int x, int y, int width, int height, float health, float maxHealth, D3DCOLOR color);
-	static void Circle(int x, int y, int radius, D3DCOLOR color);
+	static void Line(vec2d_f from, vec2d_f to, D3DCOLOR color);
 };
 
 // T: specific typename		A: additional string
@@ -42,6 +39,6 @@ template <typename T>
 const char* mergeString(T origin, const char* A)
 {
 	std::stringstream ss;
-	ss << std::to_string((int)origin) << A;
+	ss << std::to_string(origin) << A;
 	return ss.str().c_str();
 }

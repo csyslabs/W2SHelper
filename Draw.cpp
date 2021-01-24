@@ -17,29 +17,31 @@ ID3DXFont*				d3despFont;
 ID3DXFont*				d3dFontWarning;
 ID3DXLine*				d3dLine;
 
+const char* Draw::bot[6] = { "Alfa" , "Bravo", "Charlie", "Delta", "Echo", "Foxtrot" };
+
 void Draw::Initial(HWND overlayHWND) {
 	if (FAILED(Direct3DCreate9Ex(D3D_SDK_VERSION, &d3dObject))) {
 		exit(1);
 	}
 	ZeroMemory(&d3dparams, sizeof(d3dparams));
 
-	d3dparams.Windowed = true;
-	d3dparams.BackBufferWidth = Game::width;
-	d3dparams.BackBufferHeight = Game::height;
-	d3dparams.BackBufferFormat = D3DFMT_A8R8G8B8;
+	d3dparams.Windowed =				true;
+	d3dparams.BackBufferWidth =			Game::width;
+	d3dparams.BackBufferHeight =		Game::height;
+	d3dparams.BackBufferFormat =		D3DFMT_A8R8G8B8;
 
-	d3dparams.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	d3dparams.hDeviceWindow = overlayHWND;
-	d3dparams.MultiSampleQuality = D3DMULTISAMPLE_NONE;
-	d3dparams.EnableAutoDepthStencil = true;
-	d3dparams.AutoDepthStencilFormat = D3DFMT_D16;
+	d3dparams.SwapEffect =				D3DSWAPEFFECT_DISCARD;
+	d3dparams.hDeviceWindow =			overlayHWND;
+	d3dparams.MultiSampleQuality =		D3DMULTISAMPLE_NONE;
+	d3dparams.EnableAutoDepthStencil =	true;
+	d3dparams.AutoDepthStencilFormat =	D3DFMT_D16;
 
 	HRESULT res = d3dObject->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, overlayHWND, D3DCREATE_HARDWARE_VERTEXPROCESSING, &d3dparams, 0, &d3dDevice);
 	if (FAILED(res))
 		exit(1);
 
-	//D3DXCreateFont(d3dDevice, 50, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, L"Comic Sans", &d3dFont);
-	D3DXCreateFont(d3dDevice, 20, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Arial", &d3dFont);
+	D3DXCreateFont(d3dDevice, 30, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEVICE_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH, L"Comic Sans", &d3dFont);
+	//D3DXCreateFont(d3dDevice, 20, 0, FW_BOLD, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Arial", &d3dFont);
 	D3DXCreateFont(d3dDevice, 13, 0, 0, 0, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, L"Arial", &d3despFont);
 
 	// VERY IMPORTANT , IF MISSING, NULL PTR EXCEPTION WILL HAPPEN WHILE DRAW LINES AND RECTANGLES   !!!
@@ -56,21 +58,9 @@ void Draw::Render()
 	if (Game::winHWND == GetForegroundWindow())
 	{
 		// Gets self info
+		//Self::GetOpCoords();
 		Self::GetWorldCoords();
-		Self::GetViewMatrix();
-		vec3d_f rLocation = { Self::worldCoords.x + 3.f, Self::worldCoords.y, Self::worldCoords.z };
-		//Draw::String(Game::width / 2, Game::height / 2, ToHexString(Self::address).c_str(), Yellow);
-		if (Math::WorldToScreenC(rLocation, Math::screen, Self::viewMatrix, Game::width, Game::height)) {
-			//Draw::Rect(Math::screen.x, Math::screen.y, 50, 70, Red);
-			Draw::Line(Game::width / 2, Game::height / 2, Math::screen.x, Math::screen.y, Red);
-		}
-		/*
-		Self::GetViewMatrix();
-		Self::GetHealth();
-		Self::GetWorldCoords();
-		// Draws self info
-		*/
-		//Draw::String(Game::width / 2, Game::height / 2, "W2SHelper", Yellow);
+		Draw::RelativeCube(Self::worldCoords);
 	}
 	d3dDevice->EndScene();
 	d3dDevice->PresentEx(0, 0, 0, 0, 0);
@@ -78,18 +68,105 @@ void Draw::Render()
 	return;
 }
 
-void Draw::String(int x, int y, const char* string, D3DCOLOR color)
+void Draw::TraceLine(vec3d_f center, int index)
+{
+	vec2d_f from = { Game::width / 2, Game::height };
+	if (Math::WorldToScreenC(center, Math::screen, Self::viewMatrix, Game::width, Game::height))
+	{
+		Draw::Line(from, Math::screen, Yellow);
+		Draw::String(Math::screen, bot[index], Red);
+	}
+}
+
+bool Draw::isInScreen(vec2d_f vertex_2d[8])
+{
+	float min_x = 1e6 + 7, max_x = -1e6 - 7;
+	float min_y = 1e6 + 7, max_y = -1e6 - 7;
+
+	for (int i = 0; i < 8; i++) {
+		float x = vertex_2d[i].x, y = vertex_2d[i].y;
+		if (x > max_x) max_x = x;
+		if (x < min_x) min_x = x;
+		if (y > max_y) max_y = y;
+		if (y < min_y) min_y = y;
+	}
+	return min_x > Game::right || max_x < Game:: left || min_y > Game::top || max_y < Game::bottom;
+}
+
+void Draw::Cube(vec3d_f center, float r, int index)
+{
+	float x = center.x, y = center.y, z = center.z;
+	// generates vertex
+	vec3d_f vertex[8] = {};
+	vertex[0] = { x - r, y - r, z + r };
+	vertex[1] = { x + r, y - r, z + r };
+	vertex[2] = { x + r, y + r, z + r };
+	vertex[3] = { x - r, y + r, z + r };
+
+	vertex[4] = { x - r, y - r, z - r };
+	vertex[5] = { x + r, y - r, z - r };
+	vertex[6] = { x + r, y + r, z - r };
+	vertex[7] = { x - r, y + r, z - r };
+	// draws
+	Self::GetViewMatrix();
+	vec2d_f vertex_2d[8] = {};
+	for (int i = 0; i < 8; i++) {
+		if (Math::WorldToScreenC(vertex[i], Math::screen, Self::viewMatrix, Game::width, Game::height)) {
+			vertex_2d[i] = Math::screen;
+		}
+	}
+	// draws only if cube in screen
+	if (!Draw::isInScreen(vertex_2d)) return;
+	Draw::Line(vertex_2d[0], vertex_2d[1], Yellow);
+	Draw::Line(vertex_2d[1], vertex_2d[2], Yellow);
+	Draw::Line(vertex_2d[2], vertex_2d[3], Yellow);
+	Draw::Line(vertex_2d[3], vertex_2d[0], Yellow);
+
+	Draw::Line(vertex_2d[4], vertex_2d[5], Yellow);
+	Draw::Line(vertex_2d[5], vertex_2d[6], Yellow);
+	Draw::Line(vertex_2d[6], vertex_2d[7], Yellow);
+	Draw::Line(vertex_2d[7], vertex_2d[4], Yellow);
+
+	Draw::Line(vertex_2d[0], vertex_2d[4], Yellow);
+	Draw::Line(vertex_2d[1], vertex_2d[5], Yellow);
+	Draw::Line(vertex_2d[2], vertex_2d[6], Yellow);
+	Draw::Line(vertex_2d[3], vertex_2d[7], Yellow);
+
+	Draw::TraceLine(center, index);
+}
+
+
+
+void Draw::RelativeCube(vec3d_f worldCoords)
+{
+	float x = worldCoords.x, y = worldCoords.y, z = worldCoords.z;
+	float re = 12.f;
+	// front, behind, left, right
+	Draw::Cube({ x, y + re, z }, 1, 0);
+	Draw::Cube({ x, y - re, z }, 1, 1);
+	Draw::Cube({ x - re, y, z }, 1, 2);
+	Draw::Cube({ x + re, y, z }, 1, 3);
+	// above, below
+	Draw::Cube({ x, y, z + re}, 1, 4);
+	Draw::Cube({ x, y, z - re}, 1, 5);
+}
+
+
+void Draw::Line(vec2d_f from, vec2d_f to, D3DCOLOR color)
+{
+	D3DXVECTOR2 Line[2];
+	Line[0] = D3DXVECTOR2(from.x, from.y);
+	Line[1] = D3DXVECTOR2(to.x, to.y);
+	d3dLine->SetWidth(2);
+	d3dLine->Draw(Line, 2, color);
+}
+
+void Draw::String(vec2d_f pos, const char* string, D3DCOLOR color)
 {
 	RECT Position;
-	Position.left = x + 1;
-	Position.top = y + 1;
-	//d3dFont->DrawTextA(0, string, strlen(string), &Position, DT_NOCLIP, color);
+	Position.left = pos.x + 1;
+	Position.top = pos.y + 1;
 	d3dFont->DrawTextA(0, string, strlen(string), &Position, DT_NOCLIP, color);
-
-	//Position.left = x;
-	//Position.top = y;
-	//d3dFont->DrawTextA(0, string, strlen(string), &Position, DT_NOCLIP, color);
-
 }
 
 // const char* cc = string_value.c_str();
@@ -115,74 +192,7 @@ std::string Draw::ToHexString(uintptr_t n)
 	return res;
 }
 
-// [x, y} is the middle point if each entity
-void Draw::Rect(int x, int y, int width, int height, D3DCOLOR color)
-{
-	int startX = x - width / 2, startY = y - height / 2;
-	D3DXVECTOR2 Rect[5];
-	Rect[0] = D3DXVECTOR2(startX, startY);
-	Rect[1] = D3DXVECTOR2(startX + width, startY);
-	Rect[2] = D3DXVECTOR2(startX + width, startY + height);
-	Rect[3] = D3DXVECTOR2(startX, startY + height);
-	Rect[4] = D3DXVECTOR2(startX, startY);
-	d3dLine->SetWidth(2);
-	d3dLine->Draw(Rect, 5, color);
-}
 
-// ?
-void Draw::BorderedRect(int x, int y, int width, int height, int fa, int fr, int fg, int fb, D3DCOLOR color)
-{
-	int startX = x - width / 2, startY = y - height / 2;
-	D3DXVECTOR2 Fill[2];
-	Fill[0] = D3DXVECTOR2(startX + width / 2, startY);
-	Fill[1] = D3DXVECTOR2(startX + width / 2, startY + height);
-	d3dLine->SetWidth(width);
-	d3dLine->Draw(Fill, 2, D3DCOLOR_ARGB(fa, fr, fg, fb));
 
-	D3DXVECTOR2 Rect[5];
-	Rect[0] = D3DXVECTOR2(startX, startY);
-	Rect[1] = D3DXVECTOR2(startX + width, startY);
-	Rect[2] = D3DXVECTOR2(startX + width, startY + height);
-	Rect[3] = D3DXVECTOR2(startX, startY + height);
-	Rect[4] = D3DXVECTOR2(startX, startY);
-	d3dLine->SetWidth(1);
-	d3dLine->Draw(Rect, 5, color);
-}
 
-void Draw::Line(int x, int y, int x1, int y2, D3DCOLOR color)
-{
-	D3DXVECTOR2 Line[2];
-	Line[0] = D3DXVECTOR2(x, y);
-	Line[1] = D3DXVECTOR2(x1, y2);
-	d3dLine->SetWidth(2);
-	d3dLine->Draw(Line, 2, color);
-}
-
-void Draw::HealthBar(int x, int y, int width, int height, float health, float maxHealth, D3DCOLOR color)
-{
-	int startX = x - width / 2, startY = y + height / 2;
-	D3DXVECTOR2 Rect[2];
-	Rect[0] = D3DXVECTOR2(startX, startY);
-	Rect[1] = D3DXVECTOR2(startX, startY - (health / maxHealth) * height);
-	d3dLine->SetWidth(3);
-	d3dLine->Draw(Rect, 2, color);
-}
-
-void Draw::Circle(int x, int y, int radius, D3DCOLOR color)
-{
-	D3DXVECTOR2 DotPoints[128];
-	D3DXVECTOR2 Line[128];
-	int Points = 0;
-	for (float i = 0; i < M_PI * 2.0f; i += 0.1f)
-	{
-		float PointOriginX = x + radius * cos(i);
-		float PointOriginY = y + radius * sin(i);
-		float PointOriginX2 = radius * cos(i + 0.1) + x;
-		float PointOriginY2 = radius * sin(i + 0.1) + y;
-		DotPoints[Points] = D3DXVECTOR2(PointOriginX, PointOriginY);
-		DotPoints[Points + 1] = D3DXVECTOR2(PointOriginX2, PointOriginY2);
-		Points += 2;
-	}
-	d3dLine->Draw(DotPoints, Points, color);
-}
 
